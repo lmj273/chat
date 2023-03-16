@@ -33,8 +33,7 @@ router.post("/auth", async (req, res) => {
       });
     } else {
       const rows2 = await db(`
-      INSERT INTO auth (a_email, a_digit) VALUES ("${email}", "${rnd}")
-      `);
+      INSERT INTO auth (a_email, a_digit) VALUES ("${email}", "${rnd}")`);
       sendMail(email, rnd);
       logger.info(`/users/auth POST "${email}" 로 인증번호를 보내었습니다.`);
       return res.status(201).json({
@@ -103,16 +102,16 @@ router.post("/sign", async (req, res) => {
   const { email, pwd, name, nick } = req.body;
   const encryptPwd = encrypt(pwd);
   if (!email || !pwd || !name || !nick) {
-    logger.error(`값이 없음`);
+    logger.error(`/users/sign POST 값이 없음`);
     return res.status(400).json({
       status: "fail",
       message: "need check data",
     });
   }
   try {
-    const rows = await db(`
-    SELECT u_id, u_email FROM user WHERE u_email = "${email}"
-    `);
+    const rows = await db(
+      `SELECT u_id, u_email FROM user WHERE u_email = "${email}"`
+    );
     if (rows.length > 0) {
       logger.info(
         `/users/sign POST "${email}" 이미 가입되어있는 이메일 입니다.`
@@ -127,8 +126,7 @@ router.post("/sign", async (req, res) => {
       });
     } else {
       const rows2 = await db(`
-      INSERT INTO user (u_email, u_pwd, u_name, u_nick) VALUES ("${email}","${encryptPwd}","${name}","${nick}")
-      `);
+      INSERT INTO user (u_email, u_pwd, u_name, u_nick) VALUES ("${email}","${encryptPwd}","${name}","${nick}")`);
       logger.info(`/users/sign POST "${email}"로 가입성공 하였습니다.`);
       return res.status(200).json({
         status: "success",
@@ -162,17 +160,10 @@ router.post("/login", async (req, res) => {
       message: "need check data",
     });
   }
-
   try {
-    const rows = await db(`
-    SELECT 
-    u_id,
-    u_email,
-    u_pwd,
-    u_name,
-    u_nick
-    FROM user WHERE u_email = "${email}"
-    `);
+    const rows = await db(`SELECT 
+    u_id, u_email, u_pwd, u_name, u_nick
+    FROM user WHERE u_email = "${email}"`);
     if (rows.length > 0) {
       if (rows[0].u_pwd === encryptPwd) {
         logger.info(`/users/login POST "${email}"사용자 로그인`);
